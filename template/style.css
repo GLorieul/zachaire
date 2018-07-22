@@ -6,12 +6,12 @@ body
     background-color: #ffda55;
 }
 
-#pukeLogo
+#logoImage
 {
-    width: 319px;
-    height: 96px;
+    width: 532px;
+    height:150px;
     margin: 10px auto 5px auto; /* top right bottom left */
-    background-image: url("imgs/puke/puke_96.png");
+    background-image: url("imgs/template/logo.png");
 }
 
 #menuBar
@@ -53,7 +53,7 @@ body
     background-position: center center;
 }
 
-#headerImageHome { background-image: url("imgs//headerImages/city05_lite.jpg"); }
+#headerImageHome { background-image: url("imgs/template/headerImage.jpg"); }
 
 ul.menuItem
 {
@@ -98,7 +98,7 @@ nav
     box-shadow: 0px 0px 10px black;
 }
 
-#articleArea
+#mainArea
 {
     margin-left: 100px;
     padding: 0;
