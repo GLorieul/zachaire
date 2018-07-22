@@ -1,0 +1,377 @@
+
+body
+{
+    margin: 0;
+    padding: 0;
+    background-color: #ffda55;
+}
+
+#pukeLogo
+{
+    width: 319px;
+    height: 96px;
+    margin: 10px auto 5px auto; /* top right bottom left */
+    background-image: url("imgs/puke/puke_96.png");
+}
+
+#menuBar
+{
+    width: 532px;
+    height: 48px;
+    margin: 13px auto 0px auto; /* top right bottom left */
+}
+
+.menuButton
+{
+    width: 133px;
+    height: 48px;
+    float: left;
+}
+
+#buttonHome     { background-image: url("imgs/mainMenu/button_home_48.png"); }
+#buttonLearning { background-image: url("imgs/mainMenu/button_learning_48.png"); }
+#buttonCity     { background-image: url("imgs/mainMenu/button_city_48.png"); }
+#buttonRegister { background-image: url("imgs/mainMenu/button_register_48.png"); }
+#buttonContact  { background-image: url("imgs/mainMenu/button_contact_48.png"); }
+
+#pageHeader
+{
+    height: 160px;
+    margin: 0;
+    padding: 10px 0px; /* bot&top lft&rgh */
+    background-color: white;
+    box-shadow: 0px 0px 10px black;
+    position: relative; /* For z-index to have some effect */
+    z-index: 0;
+}
+
+.headerImage
+{
+    height: 300px;
+    margin: auto;
+    background-size: cover;
+    background-position: center center;
+}
+
+#headerImageHome { background-image: url("imgs//headerImages/city05_lite.jpg"); }
+
+ul.menuItem
+{
+    padding: 0;
+}
+
+li.menuItem
+{
+    margin: 0;
+    padding: 10px;
+    list-style-type: none;
+}
+
+a.menuItem
+{
+    display: inline;
+    color: #ddd;
+    text-decoration: none;
+}
+
+li.menuItem:hover
+{
+    background-color: #333333;
+}
+
+a.menuItem:hover
+{
+    color: #fff;
+}
+
+nav
+{
+    height: 100%;
+    width: 100px;
+    position: fixed;
+    z-index: 1; /*Stay on top*/
+    top: 0;
+    left: 0;
+    background-color: #111111;
+    overflow-x: hidden;
+    padding-top: 60px;
+    box-shadow: 0px 0px 10px black;
+}
+
+#articleArea
+{
+    margin-left: 100px;
+    padding: 0;
+}
+
+article
+{
+    width: 800px;
+    padding: 10px 10px 10px 10px;
+    background-color: white;
+    margin: auto;
+    box-shadow: 0px 0px 10px black;
+    position: relative;
+    top: -70px;
+}
+
+@media screen and ( max-width: 800px ){
+    article{
+        width: 100%;
+    }
+}
+
+/* GENERIC STYLES FOR HTML ELEMENTS */
+
+body
+{
+    font-family: sans-serif;
+}
+
+h1
+{
+    text-transform: uppercase;
+    font-size: 50px;
+    margin: 10px 0px; /* bot&top lft&rgh */
+}
+
+h2
+{
+    font-size: 30px;
+    margin: 10px 0px; /* bot&top lft&rgh */
+}
+
+q
+{
+    font-size: 16px;
+}
+
+blockquote
+{
+    font-style: italic;
+    color: #555;
+}
+
+p, li
+{
+    text-align: justify;
+    font-size: 20px;
+}
+
+p
+{
+    margin: 10px 0px; /* bot&top lft&rgh */
+}
+
+img+em
+{
+    display: block;
+    text-align: center;
+    width: 75%;
+    margin: 5px auto 40px auto; /* top right bottom left */
+}
+
+img
+{
+    display: block;
+    margin: 50px auto 5px auto; /* top right bottom left */
+}
+
+table
+{
+    width: 100% !important; /*Pandoc might insert a CSS inline style in the html output it generates*/
+    table-layout: auto;
+}
+
+col
+{
+    width: 0 !important; /*By default pandoc tries to have identical width for all columns*/
+}
+
+table, th, td
+{
+    border-collapse: collapse;
+    border: 0;
+}
+
+th, td
+{
+    padding: 5px 5px; /* bot&top lft&rgh */
+}
+
+thead
+{
+    background-color: #e88300;
+    color: white;
+}
+
+tr.odd
+{
+    background-color: #ffda55;
+}
+
+tr.even
+{
+    background-color: #ffecab;
+}
+
+/* STYLES SPECIFIC TO WELCOME PAGE */
+
+#quotesSection
+{
+    background-color: #9db4ff;
+    margin: 0;
+    display: block;
+    position: relative;
+    /*position: relative is required by .prev{position: absolute; top: 50%;}
+    and .next{(idem)} otherwise it's 50% of <article>*/
+}
+
+/* Slides */
+.oneSlide {
+    display: none;
+    height: 100px;
+    padding: 50px 80px 0px 80px; /* top right bottom left */
+    text-align: center;
+}
+
+.prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  margin-top: -30px;
+  padding: 16px;
+  color: #888;
+  font-weight: bold;
+  font-size: 20px;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+}
+
+/* Position the "next button" to the right */
+.next {
+  position: absolute;
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+/* On hover, add a black background color with a little bit see-through */
+.prev:hover, .next:hover {
+  color: black;
+}
+
+/* The dot/bullet/indicator container */
+.dot-container {
+    text-align: center;
+    padding: 20px;
+}
+
+/* The dots/bullets/indicators */
+.dot {
+  cursor: pointer;
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  background-color: #888;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.active, .dot:hover
+{
+  background-color: black;
+}
+
+#twoColumns
+{
+    margin-top: 10px;
+    height: 300px;
+}
+
+#newsSection
+{
+    background-color: #7bcf7b;
+    margin: 0;
+    width: 375px;
+    height: 100%;
+    float: left;
+    padding: 0 10px 0 10px; /* top right bottom left */
+}
+
+#upcomingSection
+{
+    background-color: #e88300;
+    margin: 0;
+    width: 375px;
+    height: 100%;
+    float: right;
+    padding: 0 10px 0 10px; /* top right bottom left */
+}
+
+q
+{
+    font-style: italic;
+}
+
+.quoteAuthor
+{
+    font-size: 16px;
+    text-align: center;
+}
+
+/* FORM SPECIFIC PROPERTIES */
+
+fieldset
+{
+    margin: 20px 0px; /* bot&top lft&rgh */
+}
+
+.formTable
+{
+    padding: 0;
+}
+
+label:not(.fullColumn)
+{
+    display: inline-block;
+    width: 180px;
+}
+
+input.fullColumnField
+{
+    width: 100%;
+}
+
+input.fullColumnRadio
+{
+    margin-left: 80px;
+}
+
+.submitButton
+{
+    text-align: center;
+}
+
+textarea
+{
+    display: block;
+    resize: none;
+    margin: auto;
+}
+
+/* SPECIAL PROTECTION */
+
+.e-mail:before
+{
+    content: attr(data-website) "\0040" attr(data-user);
+    unicode-bidi: bidi-override;
+    direction: rtl;
+}
+
+.formError
+{
+    color: red;
+    font-weight: bold;
+}
