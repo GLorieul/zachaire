@@ -87,7 +87,7 @@ a.menuItem:hover
 nav
 {
     height: 100%;
-    width: 100px;
+    width: 120px;
     position: fixed;
     z-index: 1; /*Stay on top*/
     top: 0;
@@ -100,7 +100,7 @@ nav
 
 #mainArea
 {
-    margin-left: 100px;
+    margin-left: 120px;
     padding: 0;
 }
 
