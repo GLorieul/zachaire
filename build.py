@@ -5,6 +5,11 @@ import shutil
 from subprocess import call
 
 
+def createParentsIfDoesNotExist(outputPath):
+    outputDir = os.path.dirname(outputPath)
+    if not os.path.isdir(outputDir):
+        os.makedirs(outputDir)
+
 def findInputFiles(srcDir):
     return _findSourceFiles(srcDir, [], [])
 
@@ -17,7 +22,8 @@ def _findSourceFiles(srcDir, srcFiles, imgDirs):
             srcFiles.append(path)
         elif os.path.isdir(path):
             isAnImageDirectory = (fileName == "imgs")
-            if isAnImageDirectory:
+            isADocumentDirectory = (fileName == "docs")
+            if isAnImageDirectory or isADocumentDirectory:
 #               print("img dir = ", path)
                 imgDirs.append(path)
             else:
@@ -35,7 +41,7 @@ def getDepth(path):
 
 def _getDepth(path):
     parentDirs = os.path.dirname(path)
-    return getDepth(parentDirs) + 1 if len(parentDirs) > 0 else 1
+    return _getDepth(parentDirs) + 1 if len(parentDirs) > 0 else 1
 
 def cleanOutput(outDir):
     if os.path.exists(outDir):
@@ -90,7 +96,59 @@ def copyFile(srcPath, output):
     shutil.copy(srcPath, outputDir)
 
 def getExtension(filePath):
-    return os.path.splitext(filePath)[1]
+    _, extension = os.path.splitext(filePath)
+    return extension
+
+def generateGallery(dirPath):
+
+    def isImageFile(file):
+        return getExtension(file) == ".jpg"
+
+    def isAThumbnail(file):
+        return file.endswith('_thumb.jpg')
+
+    def getThumbnailName(file):
+        return dirPath + '/' + os.path.splitext(fileName)[0] + '_thumb.jpg'
+
+    def getFileMTime(file):
+        return os.stat(file).st_mtime
+
+    # Copy image to destination and generate thumbnail if necessary
+    for fileName in os.listdir(dirPath):
+        galleryFile = dirPath + '/' + fileName
+
+        # Copy image to destination and generate thumbnail if necessary
+        if isImageFile(galleryFile) and (not isAThumbnail(galleryFile)):
+            galFileOutDir = galleryFile.replace(srcDir, outDir, 1)
+            copyFile(galleryFile, galFileOutDir)
+
+            # Generate associated thumbnail if necessary
+            thumbFile = getThumbnailName(galleryFile)
+            if os.path.exists(thumbFile):
+                if getFileMTime(thumbFile) < getFileMTime(galleryFile):
+                    thumbMustBeGenerated = True
+                else:
+                    thumbMustBeGenerated = False
+            else:
+                thumbMustBeGenerated = True
+
+            if thumbMustBeGenerated:
+                os.system("convert %s -resize x200 %s" % (galleryFile,thumbFile))
+                thbFileOutDir = thumbFile.replace(srcDir, outDir, 1)
+                copyFile(thumbFile, thbFileOutDir)
+
+    # Generate list of files to work from for generating the html
+    galleryData = {}
+    for fileName in os.listdir(dirPath):
+        galleryFile = dirPath + '/' + fileName
+        if isImageFile(galleryFile) and (not isAThumbnail(galleryFile)):
+            rowId = fileName[:2]
+            imageData = {'galleryFile':fileName, 'thumbFile':getThumbnailName(fileName)}
+            if rowId in galleryData:
+                galleryData[rowId].append(imageData)
+            else:
+                galleryData[rowId] = [imageData]
+    print(galleryData)
 
 
 srcDir       = "content"
@@ -111,11 +169,17 @@ for srcFile in srcFiles:
         copyFile(srcFile, srcFileInOutputDir)
         makeHtmlFromMarkdown(srcFileInOutputDir, templateHtml)
         os.remove(srcFileInOutputDir)
+    elif getExtension(srcFile) == ".gallery":
+        dirPath = os.path.dirname(srcFile) 
+        generateGallery(dirPath)
+        print("srcFile = ", srcFile)
     elif getExtension(srcFile) == ".html":
         outputPath = srcFile.replace(srcDir, outDir, 1)
+        createParentsIfDoesNotExist(outputPath)
         generateHtmlFromTemplate(outputPath, srcFile, templateHtml)
     elif getExtension(srcFile) == ".php":
         outputPath = srcFile.replace(srcDir, outDir, 1)
+        createParentsIfDoesNotExist(outputPath)
         generateHtmlFromTemplate(outputPath, srcFile, templateHtml)
 
 for imgDir in imgDirs:
