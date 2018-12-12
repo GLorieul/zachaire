@@ -39,3 +39,17 @@ def copyToOutput(srcFile):
     outFile = substituteContentDirWithOutputDir(srcFile)
     copyFile(srcFile, outFile)
 
+def getDepth(path):
+    dirPath = os.path.dirname(path)
+    dirPath = os.path.normpath(dirPath)
+    return _getDepth(dirPath)
+
+def _getDepth(path):
+    parentDirs = os.path.dirname(path)
+    return _getDepth(parentDirs) + 1 if len(parentDirs) > 0 else 1
+
+def createParentsIfDoesNotExist(outputPath):
+    outputDir = os.path.dirname(outputPath)
+    if not os.path.isdir(outputDir):
+        os.makedirs(outputDir)
+
