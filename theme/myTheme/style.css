@@ -11,7 +11,7 @@ body
     width: 532px;
     height:150px;
     margin: 10px auto 5px auto; /* top right bottom left */
-    background-image: url("imgs/template/logo.png");
+    background-image: url("<themeUrl>/imgs/logo.png");
 }
 
 #menuBar
@@ -28,11 +28,11 @@ body
     float: left;
 }
 
-#buttonHome     { background-image: url("imgs/mainMenu/button_home_48.png"); }
-#buttonLearning { background-image: url("imgs/mainMenu/button_learning_48.png"); }
-#buttonCity     { background-image: url("imgs/mainMenu/button_city_48.png"); }
-#buttonRegister { background-image: url("imgs/mainMenu/button_register_48.png"); }
-#buttonContact  { background-image: url("imgs/mainMenu/button_contact_48.png"); }
+#buttonHome     { background-image: url("<themeUrl>/imgs/mainMenu/button_home_48.png"); }
+#buttonLearning { background-image: url("<themeUrl>/imgs/mainMenu/button_learning_48.png"); }
+#buttonCity     { background-image: url("<themeUrl>/imgs/mainMenu/button_city_48.png"); }
+#buttonRegister { background-image: url("<themeUrl>/imgs/mainMenu/button_register_48.png"); }
+#buttonContact  { background-image: url("<themeUrl>/imgs/mainMenu/button_contact_48.png"); }
 
 #pageHeader
 {
@@ -53,7 +53,7 @@ body
     background-position: center center;
 }
 
-#headerImageHome { background-image: url("imgs/template/headerImage.jpg"); }
+#headerImageHome { background-image: url("<themeUrl>/imgs/headerImage.jpg"); }
 
 ul.menuItem
 {

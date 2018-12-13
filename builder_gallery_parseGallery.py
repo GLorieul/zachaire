@@ -2,7 +2,7 @@
 import re
 import os
 from builder_gallery_util import getThumbnailName
-from util_files import substituteContentDirWithOutputDir, substituteExtension
+from util_files import substituteExtension
 
 
 

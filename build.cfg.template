@@ -1,0 +1,5 @@
+
+websiteRoot = https://mywebsite.com/
+#websiteRoot = https://localhost/
+#websiteRoot = /path/to/your/website/project/out
+

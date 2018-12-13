@@ -1,14 +1,18 @@
 
+import configparser
 import errno
 import os
+import re
 import shutil
 
 
-srcDir       = "content"
-outDir       = "out"
-templateDir  = "template"
-templateHtml = os.path.join(templateDir, "template.html")
-templateCss  = os.path.join(templateDir, "style.css")
+def parseCfgFile(cfgPath):
+    with open(cfgPath, 'r') as cfgFile:
+        cfgFileContent = '[Dummy section]\n' + cfgFile.read()
+    buildCfg = configparser.ConfigParser()
+    buildCfg.read_string(cfgFileContent)
+    return buildCfg["Dummy section"]
+
 
 
 def getExtension(filePath):
@@ -18,25 +22,6 @@ def getExtension(filePath):
 def substituteExtension(filePath, newExtension):
     pathWithoutExtension, extension = os.path.splitext(filePath)
     return pathWithoutExtension + "." + newExtension
-
-def substituteContentDirWithOutputDir(filePath):
-    isWithinContentDir = (filePath.find(srcDir) == 0)
-    if not isWithinContentDir:
-        raise Exception(f"File or directory is not within the \"{srcDir}/\" directory"
-                        + f"\t filePath=\"{filePath}\"")
-    # "max=1" => Only replace the first occurence.
-    # If a subdirectory with the same name exists it will be left untouched
-    # Note: thanks to the previous line we are 100% certain that
-    return filePath.replace(srcDir, outDir, 1)
-
-def getDepth(path):
-    dirPath = os.path.dirname(path)
-    dirPath = os.path.normpath(dirPath)
-    return _getDepth(dirPath)
-
-def _getDepth(path):
-    parentDirs = os.path.dirname(path)
-    return _getDepth(parentDirs) + 1 if len(parentDirs) > 0 else 1
 
 def createParentsIfDoesNotExist(outputPath):
     outputDir = os.path.dirname(outputPath)
@@ -48,10 +33,8 @@ def createParentsIfDoesNotExist(outputPath):
 
 
 
-
-
 def mkdir(newDir):
-    os.mkdir(outDir)
+    os.mkdir(newDir)
 
 def mkdirParents(dirPath):
     os.makedirs(dirPath)
