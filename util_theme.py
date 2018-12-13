@@ -5,16 +5,12 @@ from util_files import getDepth, mv, rm, cp
 
 
 def injectTheme(rawHtmlFile, themeName):
-    workDir = os.path.dirname(rawHtmlFile)
-    themeHtml = f"theme/{themeName}/template.html"
-    themeCss = f"theme/{themeName}/style.css"
     themedHtmlPath = rawHtmlFile
     mv(rawHtmlFile, rawHtmlFile + ".tmp")
     rawHtmlFile = rawHtmlFile + ".tmp"
-    makeThemedHtml(themedHtmlPath, rawHtmlFile, themeHtml)
+    makeThemedHtml(themedHtmlPath, rawHtmlFile, themeName)
     rm(rawHtmlFile)
 
-    cp(themeCss, workDir)
     # Note that the same css file will be duplicated: one copy in each subdir
     # Not a problem because:
     #  1. There is one parent css file ("theme/[...]/style.css").
@@ -32,29 +28,46 @@ def injectTheme(rawHtmlFile, themeName):
     #     philosophy.
 
 
-def makeThemedHtml(outputPath, contentPath, htmlTemplatePath):
-    outputFileContent = []
+def __injectLinkToCss(htmlLines):
+    linkToCss = f"<link rel=\"stylesheet\" href=\"style.css\" />"
+    htmlLines.append( linkToCss )
 
-    with open(htmlTemplatePath) as templateFile, open(contentPath) as contentFile:
-        for templateLine in templateFile:
+def __injectHtmlContent(htmlLines, htmlContentPath):
+    with open(htmlContentPath) as htmlContentFile:
+        for contentLine in htmlContentFile:
+            htmlLines.append(contentLine)
+
+def __injectMenu(htmlLines, outFilePath):
+    htmlLines.append("<ul class=\"menuItem\">")
+    with open('content/menu.csv', newline='') as menuFile:
+        csvMenuReader = csv.DictReader(menuFile, delimiter=',', quotechar='"')
+        for row in csvMenuReader:
+            linkPath = os.path.join(*([".."]*(getDepth(outFilePath) -1)), row['Path'])
+            listItemTag = "<li class=\"menuItem\">{row['LinkName']}</li>"
+            linkTag = (f"<a href=\"{linkPath}\" class=\"menuItem\">"
+                      + listItemTag + "</a>")
+            htmlLines.append(linkTag)
+    htmlLines.append("</ul>")
+
+def makeThemedHtml(outFilePath, htmlContentPath, themeName):
+    themeHtmlPath = f"theme/{themeName}/template.html"
+    themeCssPath = f"theme/{themeName}/style.css"
+    workDir = os.path.dirname(htmlContentPath)
+    cp(themeCssPath, workDir)
+    htmlLines = []
+
+    with open(themeHtmlPath) as themeHtmlFile:
+        for templateLine in themeHtmlFile:
             if "<!-- Link to CSS here -->" in templateLine:
-                pathToCss = "style.css"
-                outputFileContent.append(f"<link rel=\"stylesheet\" href=\"{pathToCss}\" />")
-                "../" * getDepth(outputPath)
+                __injectLinkToCss(htmlLines)
             elif "<!-- Include content here -->" in templateLine:
-                for contentLine in contentFile:
-                    outputFileContent.append(contentLine)
+                __injectHtmlContent(htmlLines, htmlContentPath)
             elif "<!-- Include menu here -->" in templateLine:
-                    outputFileContent.append("<ul class=\"menuItem\">")
-                    with open('content/menu.csv', newline='') as csvfile:
-                        for row in csv.DictReader(csvfile, delimiter=',', quotechar='"'):
-                            linkPath = os.path.join(*([".."]*(getDepth(outputPath) -1)), row['Path'])
-                            outputFileContent.append(f"<a href=\"{linkPath}\" class=\"menuItem\"><li class=\"menuItem\">{row['LinkName']}</li></a>")
-                    outputFileContent.append("</ul>")
+                __injectMenu(htmlLines, outFilePath)
             else:
-                outputFileContent.append(templateLine)
+                htmlLines.append(templateLine)
 
-    with open(outputPath, 'w') as outputFile:
-        for outputLine in outputFileContent:
+    with open(outFilePath, 'w') as outputFile:
+        for outputLine in htmlLines:
             outputFile.write(outputLine)
 

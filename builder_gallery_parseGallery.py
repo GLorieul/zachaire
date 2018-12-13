@@ -8,26 +8,26 @@ from util_files import substituteContentDirWithOutputDir, substituteExtension
 
 
 
-def isHeader(line):
+def __isHeader(line):
     try:
-        parseHeaderLine(line)
+        __parseHeaderLine(line)
     except:
         return False
     return True
 
-def isImageLine(line):
+def __isImageLine(line):
     try:
         parseImageLine(line)
     except:
         return False
     return True
 
-def isEmptyLine(line):
+def __isEmptyLine(line):
     p = re.compile(r'^ *$\n?')
     m = p.match(line)
     return m != None
 
-def parseHeaderLine(line):
+def __parseHeaderLine(line):
     p = re.compile(r'^(##*)(.*)')
     m = p.match(line)
 
@@ -41,15 +41,15 @@ def parseHeaderLine(line):
     headerClass = len(headerMark)
     return headerClass, headerText.strip()
 
-def translateHeader(line):
-    headerClass, titleStr = parseHeaderLine(line)
+def __translateHeader(line):
+    headerClass, titleStr = __parseHeaderLine(line)
     startTag = f"<h{headerClass}>"
     endTag = f"</h{headerClass}>"
     return startTag + titleStr + endTag
 
 def extractCurrentImageRow(lines):
     for lineNb,line in enumerate(lines):
-        if not isImageLine(line):
+        if not __isImageLine(line):
             return lines[:lineNb]
 
 def parseImageLine(line):
@@ -65,7 +65,7 @@ def parseImageLine(line):
     caption   = m.group(2)
     return imageLink, caption.strip()
 
-def translateImageRow(srcLines):
+def __translateImageRow(srcLines):
     # PARSE IMAGE ROW
     imageData = []
     for line in srcLines:
@@ -93,20 +93,20 @@ def translateImageRow(srcLines):
 
     return htmlLines
 
-def parseContents(srcLines):
+def __parseContents(srcLines):
     htmlLines = []
     while srcLines:
         currentLine = srcLines[0]
         # Following this line it will be safe to test line[0]
         # because we are sure it exists
-        if isEmptyLine(currentLine):
+        if __isEmptyLine(currentLine):
             srcLines = srcLines[1:]
-        elif isHeader(currentLine):
-            htmlLines.append( translateHeader(currentLine) )
+        elif __isHeader(currentLine):
+            htmlLines.append( __translateHeader(currentLine) )
             srcLines = srcLines[1:]
-        elif isImageLine(currentLine):
+        elif __isImageLine(currentLine):
             linesForImageRow = extractCurrentImageRow(srcLines)
-            htmlLines.append( translateImageRow(linesForImageRow) )
+            htmlLines.append( __translateImageRow(linesForImageRow) )
             srcLines = srcLines[len(linesForImageRow):]
         else:
             raise Exception(  "Illegal syntax on line:\n"
@@ -118,7 +118,7 @@ def makeHtmlFromGalleryFile(galleryFile):
     with open(galleryFile,'r') as srcFile:
         srcLines = srcFile.readlines()
 
-    htmlLines = parseContents(srcLines)
+    htmlLines = __parseContents(srcLines)
 
     with open(htmlPath,'w') as htmlFile:
         for line in htmlLines:

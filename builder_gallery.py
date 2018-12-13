@@ -5,14 +5,14 @@ from builder_gallery_util import getThumbnailName
 from builder_gallery_parseGallery import makeHtmlFromGalleryFile
 from util_theme import injectTheme
 
-def isImageFile(path):
+def __isImageFile(path):
     return getExtension(path) == ".jpg"
-def isAThumbnail(path):
+def __isAThumbnail(path):
     return path.endswith('_thumb.jpg')
-def isGalleryFile(path):
+def __isGalleryFile(path):
     return path.endswith('.gallery')
 
-def makeThumbnail(rawImg):
+def __makeThumbnail(rawImg):
     thumbImg = getThumbnailName(rawImg)
     os.system("convert %s -resize x200 %s" % (rawImg, thumbImg))
 
@@ -22,10 +22,10 @@ def build(subdirToBuild, buildCfg):
     for srcFile in os.scandir(subdirToBuild):
         print("\t" + srcFile.path)
         if srcFile.is_file(): #Filter out subdirs
-            if isImageFile(srcFile.name):
+            if __isImageFile(srcFile.name):
                 rawImg = srcFile.path
-                makeThumbnail(rawImg)
-            elif isGalleryFile(srcFile.name):
+                __makeThumbnail(rawImg)
+            elif __isGalleryFile(srcFile.name):
                 galleryFile = srcFile.path
                 htmlFile = makeHtmlFromGalleryFile(galleryFile)
                 rm(galleryFile)

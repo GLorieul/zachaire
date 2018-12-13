@@ -15,14 +15,6 @@ def getExtension(filePath):
     _, extension = os.path.splitext(filePath)
     return extension
 
-def copyFile(srcPath, output): # Old function : to be removed
-    """'output' can be a directory or a file
-    """
-    outputDir = os.path.dirname(output)
-    os.makedirs(outputDir, exist_ok=True)
-    shutil.copy(srcPath, outputDir)
-
-
 def substituteExtension(filePath, newExtension):
     pathWithoutExtension, extension = os.path.splitext(filePath)
     return pathWithoutExtension + "." + newExtension
@@ -36,10 +28,6 @@ def substituteContentDirWithOutputDir(filePath):
     # If a subdirectory with the same name exists it will be left untouched
     # Note: thanks to the previous line we are 100% certain that
     return filePath.replace(srcDir, outDir, 1)
-
-def copyToOutput(srcFile):
-    outFile = substituteContentDirWithOutputDir(srcFile)
-    copyFile(srcFile, outFile)
 
 def getDepth(path):
     dirPath = os.path.dirname(path)
@@ -60,8 +48,7 @@ def createParentsIfDoesNotExist(outputPath):
 
 
 
-def rmRecursive():
-    shutil.rmtree(directory)
+
 
 def mkdir(newDir):
     os.mkdir(outDir)
@@ -81,6 +68,20 @@ def getDirMTime(directory):
             latestMTime = max(latestMTime, fileMTime)
     return latestMTime
 
+def getMTime(path):
+    if os.path.isfile(path):
+        return getFileMTime(path)
+    elif os.path.isdir(path):
+        return getDirMTime(path)
+    else:
+        raise Exception( "'path' must be either file or directory"
+                       +f"\tpath = {path}")
+
+def isNewerThan(tested, ref):
+    return getMTime(tested) > getMTime(ref)
+
+
+
 def cp(src, dst):
     shutil.copy(src, dst)
 
@@ -97,6 +98,8 @@ def copyFilesInDirs(srcDir, dstDir):
     for entry in os.scandir(srcDir):
         if entry.is_file():
             cp(entry.path, dstDir)
+
+
 
 def rm(filePath):
     os.remove(filePath)
