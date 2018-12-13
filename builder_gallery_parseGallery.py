@@ -1,11 +1,9 @@
 
 import re
 import os
+from builder_gallery_util import getThumbnailName
 from util_files import substituteContentDirWithOutputDir, substituteExtension
 
-
-def getThumbnailName(fileName):
-    return os.path.splitext(fileName)[0] + '_thumb.jpg'
 
 
 
@@ -115,14 +113,15 @@ def parseContents(srcLines):
                            + f"\t\"{currentLine}\"")
     return htmlLines
 
-def parseGalleryFile(galleryFile):
-    htmlPageFile = substituteContentDirWithOutputDir(substituteExtension(galleryFile, "html"))
+def makeHtmlFromGalleryFile(galleryFile):
+    htmlPath = substituteExtension(galleryFile, "html")
     with open(galleryFile,'r') as srcFile:
         srcLines = srcFile.readlines()
 
     htmlLines = parseContents(srcLines)
 
-    with open(htmlPageFile,'w') as htmlFile:
+    with open(htmlPath,'w') as htmlFile:
         for line in htmlLines:
             htmlFile.write(line)
+    return htmlPath
 

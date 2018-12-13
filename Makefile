@@ -9,5 +9,5 @@ all:
 
 clean:
 	@printf "Cleaning directories: "
-	rm -f $(dirOut)/* 
+	rm -fr $(dirOut)/* 
 
