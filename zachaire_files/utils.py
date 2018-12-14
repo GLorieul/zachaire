@@ -1,18 +1,18 @@
 
 import os
 import sys
-from util_files import parseCfgFile
+from zachaire_files.fileManager import parseCfgFile
 
 def raiseError(errMsg):
     print("Error: ", errMsg, file=sys.stderr)
     exit(1)
 
 def getRootUrl():
-    buildCfg = parseCfgFile("build.cfg")
+    buildCfg = parseCfgFile("website.cfg")
     return buildCfg["websiteRoot"]
 
 def getThemeUrl(themeName):
-    return getRootUrl() + f"/theme/{themeName}"
+    return getRootUrl() + f"/themes/{themeName}"
 
 
 def getDepth(path):

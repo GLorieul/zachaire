@@ -1,8 +1,8 @@
 
 import os
 import subprocess
-from util_files import getExtension, rm
-from util_theme import injectTheme
+from zachaire_files.fileManager import getExtension, rm
+from zachaire_files.themeHtmlInjector import injectTheme
 
 
 def __makeHtmlFromMarkdown(mdPath):
@@ -33,7 +33,6 @@ actionForEachExt = {".md" :__generateAsMarkdown, ".html":__generateAsHtml,
 
 def build(subdirToBuild, dirBuildCfg):
     themeName = dirBuildCfg.get("themeToUse")
-    print("themeName = ", themeName)
     for srcFile in os.scandir(subdirToBuild):
         if srcFile.is_file(): #Filter out subdirs
             fileExt = getExtension(srcFile)

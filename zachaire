@@ -1,0 +1,20 @@
+#!/usr/bin/python3
+
+import argparse
+from zachaire_files import builder, cleaner
+
+
+parser = argparse.ArgumentParser(description='Builds a static webpage')
+helpCommand = ( "Zachaire command to execute. "
+              + "build: builds the website, "
+              + "clean: clean all outputs")
+parser.add_argument('command', type=str, metavar="COMMAND", choices=['build','clean'], help=helpCommand)
+args = parser.parse_args()
+
+
+if args.command == "build": builder.build()
+elif args.command == "clean": cleaner.clean()
+else:
+    print(f"Unknown command \"{args.command}\". Invoke zachaire -h")
+
+

@@ -1,8 +1,8 @@
 
 import csv
 import os
-from util_files import mv, rm, cp, parseCfgFile
-from util_misc import getRelPathToRootUrlFrom, getThemeUrl, getRootUrl
+from zachaire_files.fileManager import mv, rm, cp, parseCfgFile
+from zachaire_files.utils import getRelPathToRootUrlFrom, getThemeUrl, getRootUrl
 
 
 def injectTheme(rawHtmlFile, themeName):
@@ -38,7 +38,7 @@ def __injectMenu(htmlLines, themeName):
     htmlLines.append("</ul>")
 
 def makeThemedHtml(outFilePath, htmlContentPath, themeName):
-    themeHtmlPath = f"theme/{themeName}/template.html"
+    themeHtmlPath = f"themes/{themeName}/template.html"
     workDir = os.path.dirname(htmlContentPath)
 
     htmlLines = []

@@ -1,13 +1,12 @@
 
-import configparser
 import os
 import shutil
 
 from builders.htmlPhpAndMarkdown import builder as htmlPhpAndMarkdownBuilder
 from builders.gallery import builder as galleryBuilder
-import util_files as fl
-from util_files import isNewerThan, mkdirParents, parseCfgFile, getExtension
-from util_misc import getThemeUrl, raiseError
+import zachaire_files.fileManager as fm
+from zachaire_files.fileManager import isNewerThan, mkdirParents, parseCfgFile, getExtension
+from zachaire_files.utils import getThemeUrl, raiseError
 
 contentDir = "content"
 outDir     = "out"
@@ -18,10 +17,10 @@ def __isSubdirBuildable():
     return os.path.isfile(outSubdir + "/dirBuilding.cfg")
 
 def __flagAsToBeBuilt(outSubdir):
-    fl.touch(outSubdir + "/.dirNeedsToBeBuilt")
+    fm.touch(outSubdir + "/.dirNeedsToBeBuilt")
 
 def __releaseFlag_toBeBuilt(outSubdir):
-    fl.rm(outSubdir + "/.dirNeedsToBeBuilt")
+    fm.rm(outSubdir + "/.dirNeedsToBeBuilt")
 
 def __isSubdirBuildable(outSubdir):
     return os.path.isfile(outSubdir + "/dirBuilding.cfg")
@@ -55,17 +54,17 @@ def __substituteContentDirWithOutputDir(filePath):
 def __injectThemeUrlInCss(cssFilePath, themeName):
     """Inject website theme url in *.css file
 
-    Example of theme url: 'http://www.myWebsite.com/theme/myTheme'
+    Example of theme url: 'http://www.myWebsite.com/themes/myTheme'
 
     Typical *.css files must contain links to images that are part of the
     page's theme (e.g. "background-images" CSS tags). Those images must be
     refered to using absolute links e.g.
-    "url('http://www.myWebsite.com/theme/myTheme/imgs/img.jpg". However the
-    theme template files contained "/theme/" do not know what the website's
+    "url('http://www.myWebsite.com/themes/myTheme/imgs/img.jpg". However the
+    theme template files contained "/themes/" do not know what the website's
     root is ("http://www.myWebsite.com/" in that case). Hence they specify
     links in the form "url('<themeUrl>/imgs/img.jpg')", where the <themeUrl>
-    tag must be substituted with the website root url + path to "theme/"
-    directory (i.e. 'http://www.myWebsite.com/theme/myTheme'). The present
+    tag must be substituted with the website root url + path to "themes/"
+    directory (i.e. 'http://www.myWebsite.com/themes/myTheme'). The present
     function performs this substitution.
     """
     # Parse css file
@@ -82,40 +81,39 @@ def __injectThemeUrlInCss(cssFilePath, themeName):
             cssFile.write(line)
 
 
-if __name__ == '__main__':
-    __assertContentDirDoesNotContainReservedFile("theme")
 
+def __buildTheme():
     # BUILD THEME
     # Always build the theme because (i) it's simpler this way and
     # (ii) it's tiny hence barely costs anything
-    print("Copying contents of \"/theme/\" directory in output directory \"/out/theme/\" …")
-    if os.path.exists("out/theme"): fl.rmRecursive("out/theme")
-    fl.mkdir("out/theme")
+    print("Copying contents of \"/themes/\" directory in output directory \"/out/themes/\" …")
+    if os.path.exists("out/themes"): fm.rmRecursive("out/themes")
+    fm.mkdir("out/themes")
 
-    for themeDir in os.scandir("theme/"):
+    for themeDir in os.scandir("themes/"):
         print(f"\tCopying theme \"{themeDir.name}\"…")
         if not themeDir.is_dir(): # Skip files, etc.
             continue
 
         # Copy theme dir's contents (except "template.html")
         themeName = themeDir.name
-        fl.mkdir("out/theme/" + themeName)
-        for themeFile in os.scandir("theme/" + themeName):
+        fm.mkdir("out/themes/" + themeName)
+        for themeFile in os.scandir("themes/" + themeName):
             if themeFile.name == "template.html":
                 continue # Skip
 
-            outThemeDir = "out/theme/" + themeName
+            outThemeDir = "out/themes/" + themeName
             outFilePath = outThemeDir +"/"+ themeFile.name
-            fl.cpRecursive(themeFile.path, outFilePath)
+            fm.cpRecursive(themeFile.path, outFilePath)
 
             if getExtension(themeFile.name) == ".css":
                 __injectThemeUrlInCss(outFilePath, themeName)
 
-    # BUILD CONTENT
-#   fl.touch("content/index.html") #For debug: force building of "content/" dir
-#   fl.touch("content/photos/2017-09-xx_xianBeijing/photos.gallery")
+
+def __buildContent():
     # COPY SRC TO OUTPUT DIRECTORY + FLAG SUBDIRS THAT NEED TO BE BUILT
-    print("Copying contents that have changed…", end=" ", flush=True)
+    print("Copying content sub-directories from \"content/\" "
+         +"to output directory \"out/\"…", end=" ", flush=True)
     srcSubdirs = [x[0] for x in os.walk(contentDir)]
     for srcSubdir in srcSubdirs:
         outSubdir = __substituteContentDirWithOutputDir(srcSubdir)
@@ -124,8 +122,8 @@ if __name__ == '__main__':
         needsCopying = True if not existsOutSubdir else isSrcNewer()
         if needsCopying:
             if not existsOutSubdir: mkdirParents(outSubdir)
-            fl.rmFilesInDirs(outSubdir)
-            fl.copyFilesInDirs(srcSubdir, outSubdir)
+            fm.rmFilesInDirs(outSubdir)
+            fm.copyFilesInDirs(srcSubdir, outSubdir)
             if __isSubdirBuildable(outSubdir):
                 __flagAsToBeBuilt(outSubdir)
     print("Done!")
@@ -140,5 +138,12 @@ if __name__ == '__main__':
             builder = __getBuilder(dirBuildCfg["builderToUse"])
             builder.build(outSubdir, dirBuildCfg)
             __releaseFlag_toBeBuilt(outSubdir)
+
+def build():
+    fm.touch("content/index.html") #For debug: force building of "content/" dir
+#   fm.touch("content/photos/2017-09-xx_xianBeijing/photos.gallery")
+    __assertContentDirDoesNotContainReservedFile("themes")
+    __buildTheme()
+    __buildContent()
 
 

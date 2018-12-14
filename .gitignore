@@ -5,7 +5,7 @@ out/**
 
 # The following files are ignored because their content depend on the
 # website being designed/built
-build.cfg
+website.cfg
 
 # The content folder contains private information
 # and hence should not be included in the git history

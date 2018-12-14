@@ -1,9 +1,9 @@
 
 import os
-from util_files import getExtension, rm
 from builders.gallery.util import getThumbnailName
 from builders.gallery.parseGallery import makeHtmlFromGalleryFile
-from util_theme import injectTheme
+from zachaire_files.fileManager import getExtension, rm
+from zachaire_files.themeHtmlInjector import injectTheme
 
 def __isImageFile(path):
     return getExtension(path) == ".jpg"
