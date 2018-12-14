@@ -1,7 +1,7 @@
 
 import re
 import os
-from builder_gallery_util import getThumbnailName
+from builders.gallery.util import getThumbnailName
 from util_files import substituteExtension
 
 

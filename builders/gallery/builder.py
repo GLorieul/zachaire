@@ -1,8 +1,8 @@
 
 import os
 from util_files import getExtension, rm
-from builder_gallery_util import getThumbnailName
-from builder_gallery_parseGallery import makeHtmlFromGalleryFile
+from builders.gallery.util import getThumbnailName
+from builders.gallery.parseGallery import makeHtmlFromGalleryFile
 from util_theme import injectTheme
 
 def __isImageFile(path):

@@ -3,8 +3,8 @@ import configparser
 import os
 import shutil
 
-import builder_htmlPhpAndMarkdown
-import builder_gallery
+from builders.htmlPhpAndMarkdown import builder as htmlPhpAndMarkdownBuilder
+from builders.gallery import builder as galleryBuilder
 import util_files as fl
 from util_files import isNewerThan, mkdirParents, parseCfgFile, getExtension
 from util_misc import getThemeUrl, raiseError
@@ -29,8 +29,8 @@ def __isSubdirToBuild(outSubdir):
     return os.path.isfile(outSubdir + "/.dirNeedsToBeBuilt")
 
 def __getBuilder(builderName):
-    builders = {"htmlPhpAndMarkdown":builder_htmlPhpAndMarkdown,
-                "gallery":builder_gallery}
+    builders = {"htmlPhpAndMarkdown":htmlPhpAndMarkdownBuilder,
+                "gallery":galleryBuilder}
     try:
         return builders[builderName]
     except:
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     # BUILD THEME
     # Always build the theme because (i) it's simpler this way and
     # (ii) it's tiny hence barely costs anything
-    print("Copying \"theme/\" directory in output \"out/\" directory…")
+    print("Copying contents of \"/theme/\" directory in output directory \"/out/theme/\" …")
     if os.path.exists("out/theme"): fl.rmRecursive("out/theme")
     fl.mkdir("out/theme")
 
@@ -112,7 +112,8 @@ if __name__ == '__main__':
                 __injectThemeUrlInCss(outFilePath, themeName)
 
     # BUILD CONTENT
-    fl.touch("content/index.html") #For debug: force building of "content/" dir
+#   fl.touch("content/index.html") #For debug: force building of "content/" dir
+#   fl.touch("content/photos/2017-09-xx_xianBeijing/photos.gallery")
     # COPY SRC TO OUTPUT DIRECTORY + FLAG SUBDIRS THAT NEED TO BE BUILT
     print("Copying contents that have changed…", end=" ", flush=True)
     srcSubdirs = [x[0] for x in os.walk(contentDir)]
