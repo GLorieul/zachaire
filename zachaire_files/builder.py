@@ -5,8 +5,8 @@ import shutil
 from builders.htmlPhpAndMarkdown import builder as htmlPhpAndMarkdownBuilder
 from builders.gallery import builder as galleryBuilder
 import zachaire_files.fileManager as fm
-from zachaire_files.fileManager import isNewerThan, mkdirParents, parseCfgFile, getExtension
-from zachaire_files.utils import getThemeUrl, raiseError
+from .fileManager import isNewerThan, mkdirParents, parseCfgFile, getExtension
+from .utils import getThemeUrl, raiseError
 
 contentDir = "content"
 outDir     = "out"

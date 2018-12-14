@@ -1,7 +1,7 @@
 
 import os
-from builders.gallery.util import getThumbnailName
-from builders.gallery.parseGallery import makeHtmlFromGalleryFile
+from .util import getThumbnailName
+from .parseGallery import makeHtmlFromGalleryFile
 from zachaire_files.fileManager import getExtension, rm
 from zachaire_files.themeHtmlInjector import injectTheme
 

@@ -1,7 +1,7 @@
 
 import re
 import os
-from builders.gallery.util import getThumbnailName
+from .util import getThumbnailName
 from zachaire_files.fileManager import substituteExtension
 
 
