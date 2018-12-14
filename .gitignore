@@ -2,8 +2,14 @@
 __pycache__/**
 .*.swp
 out/**
-**/gitignored/**
 
-#The following files are ignored because their content depend on the website
+# The following files are ignored because their content depend on the
+# website being designed/built
 build.cfg
+
+# The content folder contains private information
+# and hence should not be included in the git history
+# To protect against .gitignore lines starting with '!',
+# this should be the last line of the ".gitignore" file
+/content/**
 
