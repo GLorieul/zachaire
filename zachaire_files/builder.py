@@ -6,7 +6,7 @@ from builders.htmlPhpAndMarkdown import builder as htmlPhpAndMarkdownBuilder
 from builders.gallery import builder as galleryBuilder
 import zachaire_files.fileManager as fm
 from .fileManager import isNewerThan, mkdirParents, parseCfgFile, getExtension
-from .utils import getThemeUrl, raiseError
+from .utils import getThemeUrl, raiseError, printInline
 
 contentDir = "content"
 outDir     = "out"
@@ -15,12 +15,6 @@ outDir     = "out"
 
 def __isSubdirBuildable():
     return os.path.isfile(outSubdir + "/dirBuilding.cfg")
-
-def __flagAsToBeBuilt(outSubdir):
-    fm.touch(outSubdir + "/.dirNeedsToBeBuilt")
-
-def __releaseFlag_toBeBuilt(outSubdir):
-    fm.rm(outSubdir + "/.dirNeedsToBeBuilt")
 
 def __isSubdirBuildable(outSubdir):
     return os.path.isfile(outSubdir + "/dirBuilding.cfg")
@@ -80,67 +74,123 @@ def __injectThemeUrlInCss(cssFilePath, themeName):
         for line in alteredCssLines:
             cssFile.write(line)
 
+def __isCssFile(fileName):
+    return getExtension(fileName) == ".css"
+
 
 
 def __buildTheme():
+    print("Building themes:")
+
+    # DISPLAY LIST OF THEMES
+    printInline("\tAvailable themes in \"/themes/\":")
+    allThemes = os.listdir("themes/")
+    for themeDir in allThemes:
+        printInline(f"\"{themeDir}\"")
+        [print() if themeDir==allThemes[-1] else print(", ")]
+    if not allThemes:
+        print("(None)")
+        raise Warning("No theme could be found in \"/theme/\"\n"
+                     +"The \"/theme/\" folder should contain one sub-directory "
+                     +"for each theme")
+
     # BUILD THEME
     # Always build the theme because (i) it's simpler this way and
     # (ii) it's tiny hence barely costs anything
-    print("Copying contents of \"/themes/\" directory in output directory \"/out/themes/\" …")
     if os.path.exists("out/themes"): fm.rmRecursive("out/themes")
     fm.mkdir("out/themes")
 
     for themeDir in os.scandir("themes/"):
-        print(f"\tCopying theme \"{themeDir.name}\"…")
-        if not themeDir.is_dir(): # Skip files, etc.
-            continue
+        if not themeDir.is_dir(): continue # Skip files, etc.
+
+        srcPath = f"themes/{themeDir.name}/"
+        dstPath = f"out/themes/{themeDir.name}/"
+        printInline(f"\tBuilding theme \"{themeDir.name}\": "
+                   +f"\"/{srcPath}\" -> \"/{dstPath}\"…")
 
         # Copy theme dir's contents (except "template.html")
         themeName = themeDir.name
-        fm.mkdir("out/themes/" + themeName)
-        for themeFile in os.scandir("themes/" + themeName):
-            if themeFile.name == "template.html":
-                continue # Skip
+        fm.mkdir(dstPath)
+        for themeFile in os.scandir(srcPath):
+            fileName = themeFile.name
+            outThemeFile = dstPath + "/" + fileName
+            if fileName == "template.html": continue # Skip
+            fm.cpRecursive(themeFile.path, outThemeFile)
+            if __isCssFile(fileName): __injectThemeUrlInCss(outThemeFile, themeName)
+        print("Done!")
+    print()
 
-            outThemeDir = "out/themes/" + themeName
-            outFilePath = outThemeDir +"/"+ themeFile.name
-            fm.cpRecursive(themeFile.path, outFilePath)
 
-            if getExtension(themeFile.name) == ".css":
-                __injectThemeUrlInCss(outFilePath, themeName)
+def __mustSubdirBeIgnored(subdirPath):
+    if "/.git/" in subdirPath: return True
+    if subdirPath.endswith("/.git"): return True
+    return False
+
+def __needsRefreshing(srcSubdir):
+    outSubdir = __substituteContentDirWithOutputDir(srcSubdir)
+    existsOutSubdir = os.path.isdir(outSubdir)
+    isSrcNewer = lambda : isNewerThan(srcSubdir, outSubdir)
+    return True if not existsOutSubdir else isSrcNewer()
 
 
 def __buildContent():
-    # COPY SRC TO OUTPUT DIRECTORY + FLAG SUBDIRS THAT NEED TO BE BUILT
-    print("Copying content sub-directories from \"content/\" "
-         +"to output directory \"out/\"…", end=" ", flush=True)
     srcSubdirs = [x[0] for x in os.walk(contentDir)]
-    for srcSubdir in srcSubdirs:
-        outSubdir = __substituteContentDirWithOutputDir(srcSubdir)
-        existsOutSubdir = os.path.isdir(outSubdir)
-        isSrcNewer = lambda : isNewerThan(srcSubdir, outSubdir)
-        needsCopying = True if not existsOutSubdir else isSrcNewer()
-        if needsCopying:
-            if not existsOutSubdir: mkdirParents(outSubdir)
-            fm.rmFilesInDirs(outSubdir)
-            fm.copyFilesInDirs(srcSubdir, outSubdir)
-            if __isSubdirBuildable(outSubdir):
-                __flagAsToBeBuilt(outSubdir)
-    print("Done!")
+    print("Building content:")
 
-    # BUILD EACH FLAGGED SUBDIR
-    outSubdirs = [x[0] for x in os.walk(outDir)]
-    for outSubdir in outSubdirs:
-        if __isSubdirBuildable(outSubdir) and __isSubdirToBuild(outSubdir):
-            dirBuildCfg = parseCfgFile(outSubdir + "/dirBuilding.cfg")
-            print(f"Building \"{outSubdir}/\" with "
-                 +f"\"{dirBuildCfg['builderToUse']}\" builder…") #, end="", flush=False)
-            builder = __getBuilder(dirBuildCfg["builderToUse"])
-            builder.build(outSubdir, dirBuildCfg)
-            __releaseFlag_toBeBuilt(outSubdir)
+    # FIND BUIDLABLE DIRECTORIES
+    subDirsToRefresh = []
+    buildableSubDirs = []
+    for srcSubdir in srcSubdirs:
+        if __mustSubdirBeIgnored(srcSubdir): continue
+        if __needsRefreshing(srcSubdir): subDirsToRefresh.append(srcSubdir)
+        if __isSubdirBuildable(srcSubdir): buildableSubDirs.append(srcSubdir)
+
+    # DISPLAY SUB-DIRECTORIES FOUND
+
+    print("\tBuildable sub-directories "
+         +"(\"/content/\" sub-dirs containing a \"dirBuilding.cfg\" file)")
+    # Up-to-date subDirs
+    upToDateSubDirs = set(buildableSubDirs).difference(subDirsToRefresh)
+    for subDir in upToDateSubDirs: print(f"\t\t(Up-to-date) \"/{subDir}\"")
+    # SubDirs to update
+    subDirsToUpdate = set(buildableSubDirs).intersection(subDirsToRefresh)
+    for subDir in subDirsToUpdate: print(f"\t\t(To build)   \"/{subDir}\"")
+    # No buildable subDirs
+    if not buildableSubDirs: print("\t\t(None)")
+
+    if not buildableSubDirs:
+        raise Warning("No buildable sub-directories could be found…\n"
+                     +"Place a \"dirBuilding.cfg\" file within each "
+                     +"sub-directory that must be built")
+
+    # COPYING CONTENT
+    print("\tCopying content:")
+    for srcSubdir in subDirsToRefresh:
+        outSubdir = __substituteContentDirWithOutputDir(srcSubdir)
+        printInline(f"\t\tCopying sub-directory "
+                   +f"\"/{srcSubdir}/\" -> \"/{outSubdir}/\"…")
+        existsOutSubdir = os.path.isdir(outSubdir)
+        if not existsOutSubdir: mkdirParents(outSubdir)
+        fm.rmFilesInDirs(outSubdir)
+        fm.copyFilesInDirs(srcSubdir, outSubdir)
+        print("Done!")
+    if not subDirsToRefresh: print("\t\tNo content to copy")
+
+    # BULDING CONTENT
+    print("\tBuilding content:")
+    for srcSubdir in subDirsToUpdate:
+        outSubdir = __substituteContentDirWithOutputDir(srcSubdir)
+        dirBuildCfg = parseCfgFile(outSubdir + "/dirBuilding.cfg")
+        print(f"\t\tBuilding \"{outSubdir}/\" with "
+             +f"\"{dirBuildCfg['builderToUse']}\" builder…")
+        builder = __getBuilder(dirBuildCfg["builderToUse"])
+        builder.build(outSubdir, dirBuildCfg)
+        print("\t\t\tDone!")
+    if not subDirsToUpdate: print("\t\tNo content to build")
+    print()
 
 def build():
-    fm.touch("content/index.html") #For debug: force building of "content/" dir
+#   fm.touch("content/index.html") #For debug: force building of "content/" dir
 #   fm.touch("content/photos/2017-09-xx_xianBeijing/photos.gallery")
     __assertContentDirDoesNotContainReservedFile("themes")
     __buildTheme()

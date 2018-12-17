@@ -3,6 +3,12 @@ import os
 import sys
 from zachaire_files.fileManager import parseCfgFile
 
+def printInline(msg):
+    print(msg, end=" ", flush=True)
+
+def printBuilder(msg, end='\n', file=sys.stdout, flush=False):
+    print("\t\t\t" + msg, end=end, file=file, flush=flush)
+
 def raiseError(errMsg):
     print("Error: ", errMsg, file=sys.stderr)
     exit(1)

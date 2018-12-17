@@ -3,6 +3,7 @@ import os
 import subprocess
 from zachaire_files.fileManager import getExtension, rm
 from zachaire_files.themeHtmlInjector import injectTheme
+from zachaire_files.utils import printBuilder
 
 
 def __makeHtmlFromMarkdown(mdPath):
@@ -37,7 +38,7 @@ def build(subdirToBuild, dirBuildCfg):
         if srcFile.is_file(): #Filter out subdirs
             fileExt = getExtension(srcFile)
             if fileExt in actionForEachExt: #Filter out images, etc.
-                print(f"\tGenerating from \"{srcFile.path}\"…")
+                printBuilder(f"Generating from \"{srcFile.path}\"…")
                 generator = actionForEachExt[fileExt]
                 generator(srcFile.path, themeName)
 

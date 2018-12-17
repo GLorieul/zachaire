@@ -61,6 +61,7 @@ def getMTime(path):
                        +f"\tpath = {path}")
 
 def isNewerThan(tested, ref):
+#   print(f"mTime {getMTime(tested)} vs {getMTime(ref)}")
     return getMTime(tested) > getMTime(ref)
 
 
@@ -70,6 +71,7 @@ def cp(src, dst):
 
 # Taken from https://stackoverflow.com/a/1994840/3492512
 def cpRecursive(src, dst):
+    if os.path.isdir(dst): dst += "/" + os.path.basename(src)
     try:
         shutil.copytree(src, dst)
     except OSError as exc:

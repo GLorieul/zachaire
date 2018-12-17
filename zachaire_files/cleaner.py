@@ -1,9 +1,10 @@
 
 import os
-from zachaire_files.fileManager import rmRecursive, mkdir
+from .fileManager import rmRecursive, mkdir
+from .utils import printInline
 
 def clean():
-    print("Cleaning outputs…", end=" ", flush=True)
+    printInline("Cleaning outputs…")
     if os.path.exists("out/"): rmRecursive("out/")
     mkdir("out/")
     print("Done!")
