@@ -6,6 +6,8 @@ To start building your own website:
  2. Edit `build.cfg` to indicate what is your base url (you can start by putting the result of `pwd out/`)
  3. Start writing your content in the `content/` folder, for instance `echo "# Hello world" > content/index.md`
  4. Tell Zachaire which builder and theme to use on `content/`: create the corresponding `content/dirBuilding.cfg` file that specifies both information
+        echo "builderToUse = htmlPhpAndMarkdown" > "content/dirBuilding.cfg"
+        echo "themeToUse = myTheme" >> "content/dirBuilding.cfg"
  5. Choose a theme in `theme/` and place a `theme/meTheme/menu.csv
  6. Build your website by calling `python3 build.py` (should be replaced by a call to `zachaire build` in the future). This generates the content in `out/` directory
  7. Visit your website! E.g. `firefox out/index.html`
