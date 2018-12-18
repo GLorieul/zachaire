@@ -1,5 +1,6 @@
 
 import configparser
+import os
 from .utils import raiseError, list_toString
 
 class CfgParser:
@@ -30,6 +31,12 @@ class CfgParser:
                     msg += list_toString(otherMandatoryFields)
                 raiseError(msg)
 
+        # Perform checks specific to specialization classes
+        self.performChecks()
+
+    def performChecks(self):
+        pass
+
     def __getitem__(self, key):
         try: return self.cfgDict[key]
         except:
@@ -39,6 +46,42 @@ class CfgParser:
 class WebsiteCfgParser(CfgParser):
     mandatoryFields = ("websiteRoot",)
 
+
+
+def getAvailableBuilders():
+    builders = []
+    for builderDir in os.scandir("builders/"):
+        if builderDir.is_dir():
+            builders.append(builderDir.name)
+    return builders
+
+def getAvailableThemes():
+    themes = []
+    for themeDir in os.scandir("themes/"):
+        if themeDir.is_dir():
+            themes.append(themeDir.name)
+    return themes
+
+
 class DirBuildingCfgParser(CfgParser):
     mandatoryFields = ("builderToUse", "themeToUse")
+
+    def performChecks(self):
+        # CHECK THAT BUILDER TO USE EXISTS
+        availableBuilders = getAvailableBuilders()
+        builderToUse = self.cfgDict["builderToUse"]
+        if not builderToUse in availableBuilders:
+            raiseError(f"Could not find builder: builderToUse = \"{builderToUse}\"\n"
+                      +f"While parsing configuration file \"{self.cfgPath}\"\n"
+                      +f"Known builders are: {list_toString(availableBuilders)}")
+
+        # CHECK THAT THEME TO USE EXISTS
+        availableThemes = getAvailableThemes()
+        themeToUse = self.cfgDict["themeToUse"]
+        if not themeToUse in availableThemes:
+            print("While parsing configuration file \"{self.cfgPath}\"")
+            raiseError(f"Could not find theme: themeToUse = \"{themeToUse}\"\n"
+                      +f"While parsing configuration file \"{self.cfgPath}\"\n"
+                      +f"Known themes are: {list_toString(availableThemes)}")
+
 

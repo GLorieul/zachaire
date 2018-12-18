@@ -24,20 +24,9 @@ def __isSubdirBuildable(outSubdir):
 def __isSubdirToBuild(outSubdir):
     return os.path.isfile(outSubdir + "/.dirNeedsToBeBuilt")
 
-def __getAvailableBuilders():
-    builders = []
-    for builderDir in os.scandir("builders/"):
-        if builderDir.is_dir():
-            builders.append(builderDir.name)
-    return builders
-
 def __getBuilder(builderToFind):
-    availableBuilders = __getAvailableBuilders()
-    if builderToFind in availableBuilders:
-        importMod = 'builders.' + builderToFind + ".builder"
-        return importlib.import_module(importMod)
-    raiseError(f"Could not find builder: builderToFind = \"{builderToFind}\"\n"
-              +f"Known builders are: {list_toString(availableBuilders)}")
+    moduleToImport = 'builders.' + builderToFind + ".builder"
+    return importlib.import_module(moduleToImport)
 
 def __assertContentDirDoesNotContainReservedFile(path):
     if os.path.exists("content/" + path):

@@ -4,6 +4,7 @@ from .util import getThumbnailName
 from .parseGallery import makeHtmlFromGalleryFile
 from zachaire_files.fileManager import getExtension, rm
 from zachaire_files.themeHtmlInjector import injectTheme
+from zachaire_files.utils import printBuilder
 
 def __isImageFile(path):
     return getExtension(path) == ".jpg"
@@ -20,7 +21,7 @@ def __makeThumbnail(rawImg):
 def build(subdirToBuild, dirBuildCfg):
     themeName = dirBuildCfg["themeToUse"]
     for srcFile in os.scandir(subdirToBuild):
-        print("\t" + srcFile.path)
+        printBuilder(srcFile.path)
         if srcFile.is_file(): #Filter out subdirs
             if __isImageFile(srcFile.name):
                 rawImg = srcFile.path
