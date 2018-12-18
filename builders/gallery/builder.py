@@ -18,7 +18,7 @@ def __makeThumbnail(rawImg):
 
 
 def build(subdirToBuild, dirBuildCfg):
-    themeName = dirBuildCfg.get("themeToUse")
+    themeName = dirBuildCfg["themeToUse"]
     for srcFile in os.scandir(subdirToBuild):
         print("\t" + srcFile.path)
         if srcFile.is_file(): #Filter out subdirs

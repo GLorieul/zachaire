@@ -33,7 +33,7 @@ actionForEachExt = {".md" :__generateAsMarkdown, ".html":__generateAsHtml,
                     ".php":__generateAsPhp     }
 
 def build(subdirToBuild, dirBuildCfg):
-    themeName = dirBuildCfg.get("themeToUse")
+    themeName = dirBuildCfg["themeToUse"]
     for srcFile in os.scandir(subdirToBuild):
         if srcFile.is_file(): #Filter out subdirs
             fileExt = getExtension(srcFile)

@@ -1,4 +1,5 @@
 
+import importlib
 import os
 import shutil
 
@@ -7,7 +8,7 @@ from builders.gallery import builder as galleryBuilder
 import zachaire_files.fileManager as fm
 from .cfgParser import DirBuildingCfgParser
 from .fileManager import isNewerThan, mkdirParents, getExtension
-from .utils import raiseError, raiseWarning, printInline
+from .utils import raiseError, raiseWarning, printInline, list_toString
 from .util_url import getThemeUrl, getRootUrl
 
 contentDir = "content"
@@ -23,14 +24,20 @@ def __isSubdirBuildable(outSubdir):
 def __isSubdirToBuild(outSubdir):
     return os.path.isfile(outSubdir + "/.dirNeedsToBeBuilt")
 
-def __getBuilder(builderName):
-    builders = {"htmlPhpAndMarkdown":htmlPhpAndMarkdownBuilder,
-                "gallery":galleryBuilder}
-    try:
-        return builders[builderName]
-    except:
-        raise Exception( "Unknown builder: builderToUse = "
-                       +f"\"{buildCfg['builderToUse']}\"")
+def __getAvailableBuilders():
+    builders = []
+    for builderDir in os.scandir("builders/"):
+        if builderDir.is_dir():
+            builders.append(builderDir.name)
+    return builders
+
+def __getBuilder(builderToFind):
+    availableBuilders = __getAvailableBuilders()
+    if builderToFind in availableBuilders:
+        importMod = 'builders.' + builderToFind + ".builder"
+        return importlib.import_module(importMod)
+    raiseError(f"Could not find builder: builderToFind = \"{builderToFind}\"\n"
+              +f"Known builders are: {list_toString(availableBuilders)}")
 
 def __assertContentDirDoesNotContainReservedFile(path):
     if os.path.exists("content/" + path):
@@ -92,9 +99,7 @@ def __buildTheme():
     # DISPLAY LIST OF THEMES
     printInline("\tAvailable themes in \"/themes/\":")
     allThemes = os.listdir("themes/")
-    for themeDir in allThemes:
-        printInline(f"\"{themeDir}\"")
-        [print() if themeDir==allThemes[-1] else print(", ")]
+    print(list_toString(allThemes))
     if not allThemes:
         print("(None)")
         raiseWarning("No theme could be found in \"/theme/\"\n"
