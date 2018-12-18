@@ -6,7 +6,7 @@ from builders.htmlPhpAndMarkdown import builder as htmlPhpAndMarkdownBuilder
 from builders.gallery import builder as galleryBuilder
 import zachaire_files.fileManager as fm
 from .fileManager import isNewerThan, mkdirParents, parseCfgFile, getExtension
-from .utils import getThemeUrl, raiseError, printInline
+from .utils import getThemeUrl, raiseError, raiseWarning, printInline
 
 contentDir = "content"
 outDir     = "out"
@@ -33,6 +33,10 @@ def __getBuilder(builderName):
 def __assertContentDirDoesNotContainReservedFile(path):
     if os.path.exists("content/" + path):
         raiseError(f"\"content/\" directory contains reserved file/dir \"{path}\"")
+
+def __assertWebsiteCfgFileExists():
+    if not os.path.isfile("website.cfg"):
+        raiseError("File \"/website.cfg\" is required but none could be found…")
 
 def __substituteContentDirWithOutputDir(filePath):
     isWithinContentDir = (filePath.find(contentDir) == 0)
@@ -80,6 +84,7 @@ def __isCssFile(fileName):
 
 
 def __buildTheme():
+    if not os.path.exists("out"): os.mkdir("out/")
     print("Building themes:")
 
     # DISPLAY LIST OF THEMES
@@ -90,9 +95,9 @@ def __buildTheme():
         [print() if themeDir==allThemes[-1] else print(", ")]
     if not allThemes:
         print("(None)")
-        raise Warning("No theme could be found in \"/theme/\"\n"
-                     +"The \"/theme/\" folder should contain one sub-directory "
-                     +"for each theme")
+        raiseWarning("No theme could be found in \"/theme/\"\n"
+                    +"The \"/theme/\" folder should contain one sub-directory "
+                    +"for each theme")
 
     # BUILD THEME
     # Always build the theme because (i) it's simpler this way and
@@ -147,8 +152,7 @@ def __buildContent():
 
     # DISPLAY SUB-DIRECTORIES FOUND
 
-    print("\tBuildable sub-directories "
-         +"(\"/content/\" sub-dirs containing a \"dirBuilding.cfg\" file)")
+    print("\tBuildable sub-directories:")
     # Up-to-date subDirs
     upToDateSubDirs = set(buildableSubDirs).difference(subDirsToRefresh)
     for subDir in upToDateSubDirs: print(f"\t\t(Up-to-date) \"/{subDir}\"")
@@ -156,12 +160,9 @@ def __buildContent():
     subDirsToUpdate = set(buildableSubDirs).intersection(subDirsToRefresh)
     for subDir in subDirsToUpdate: print(f"\t\t(To build)   \"/{subDir}\"")
     # No buildable subDirs
-    if not buildableSubDirs: print("\t\t(None)")
-
     if not buildableSubDirs:
-        raise Warning("No buildable sub-directories could be found…\n"
-                     +"Place a \"dirBuilding.cfg\" file within each "
-                     +"sub-directory that must be built")
+            print("\t\t(None)")
+            print("\t\tPlace a \"dirBuilding.cfg\" file in each sub-dir to build.")
 
     # COPYING CONTENT
     print("\tCopying content:")
@@ -186,13 +187,15 @@ def __buildContent():
         builder = __getBuilder(dirBuildCfg["builderToUse"])
         builder.build(outSubdir, dirBuildCfg)
         print("\t\t\tDone!")
-    if not subDirsToUpdate: print("\t\tNo content to build")
+    if not subDirsToUpdate:
+        print("\t\tNo content to build")
     print()
 
 def build():
 #   fm.touch("content/index.html") #For debug: force building of "content/" dir
 #   fm.touch("content/photos/2017-09-xx_xianBeijing/photos.gallery")
     __assertContentDirDoesNotContainReservedFile("themes")
+    __assertWebsiteCfgFileExists()
     __buildTheme()
     __buildContent()
 

@@ -13,6 +13,9 @@ def raiseError(errMsg):
     print("Error: ", errMsg, file=sys.stderr)
     exit(1)
 
+def raiseWarning(warningMsg):
+    print("Warning: ", warningMsg, file=sys.stderr)
+
 def getRootUrl():
     buildCfg = parseCfgFile("website.cfg")
     return buildCfg["websiteRoot"]
