@@ -1,17 +1,9 @@
 
-import configparser
 import errno
 import os
 import re
 import shutil
 
-
-def parseCfgFile(cfgPath):
-    with open(cfgPath, 'r') as cfgFile:
-        cfgFileContent = '[Dummy section]\n' + cfgFile.read()
-    buildCfg = configparser.ConfigParser()
-    buildCfg.read_string(cfgFileContent)
-    return buildCfg["Dummy section"]
 
 
 

@@ -1,8 +1,8 @@
 
 import csv
 import os
-from zachaire_files.fileManager import mv, rm, cp, parseCfgFile
-from zachaire_files.utils import getRelPathToRootUrlFrom, getThemeUrl, getRootUrl
+from .fileManager import mv, rm, cp
+from .util_url import getRelPathToRootUrlFrom, getThemeUrl, getRootUrl
 
 
 def injectTheme(rawHtmlFile, themeName):

@@ -5,8 +5,10 @@ import shutil
 from builders.htmlPhpAndMarkdown import builder as htmlPhpAndMarkdownBuilder
 from builders.gallery import builder as galleryBuilder
 import zachaire_files.fileManager as fm
-from .fileManager import isNewerThan, mkdirParents, parseCfgFile, getExtension
-from .utils import getThemeUrl, raiseError, raiseWarning, printInline
+from .cfgParser import DirBuildingCfgParser
+from .fileManager import isNewerThan, mkdirParents, getExtension
+from .utils import raiseError, raiseWarning, printInline
+from .util_url import getThemeUrl, getRootUrl
 
 contentDir = "content"
 outDir     = "out"
@@ -181,7 +183,7 @@ def __buildContent():
     print("\tBuilding content:")
     for srcSubdir in subDirsToUpdate:
         outSubdir = __substituteContentDirWithOutputDir(srcSubdir)
-        dirBuildCfg = parseCfgFile(outSubdir + "/dirBuilding.cfg")
+        dirBuildCfg = DirBuildingCfgParser(outSubdir + "/dirBuilding.cfg")
         print(f"\t\tBuilding \"{outSubdir}/\" with "
              +f"\"{dirBuildCfg['builderToUse']}\" builder…")
         builder = __getBuilder(dirBuildCfg["builderToUse"])
@@ -192,8 +194,9 @@ def __buildContent():
     print()
 
 def build():
-#   fm.touch("content/index.html") #For debug: force building of "content/" dir
+    fm.touch("content/index.html") #For debug: force building of "content/" dir
 #   fm.touch("content/photos/2017-09-xx_xianBeijing/photos.gallery")
+    print(f"The root of the website is set at the URL: \"{getRootUrl()}\"")
     __assertContentDirDoesNotContainReservedFile("themes")
     __assertWebsiteCfgFileExists()
     __buildTheme()
