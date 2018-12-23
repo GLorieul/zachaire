@@ -188,7 +188,8 @@ def __buildContent():
     print()
 
 def build():
-    fm.touch("content/index.html") #For debug: force building of "content/" dir
+#   fm.touch("content/index.html") #For debug: force building of "content/" dir
+#   fm.touch("content/photos/photos.md")
 #   fm.touch("content/photos/2017-09-xx_xianBeijing/photos.gallery")
     print(f"The root of the website is set at the URL: \"{getRootUrl()}\"")
     __assertContentDirDoesNotContainReservedFile("themes")

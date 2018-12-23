@@ -1,0 +1,86 @@
+
+body
+{
+    margin: 0;
+    padding: 0;
+    background-color: #dddddd;
+    font-family: sans-serif;
+}
+
+h1
+{
+    text-transform: uppercase;
+    font-size: 50px;
+    margin: 10px 0px; /* bot&top lft&rgh */
+}
+
+h2
+{
+    font-size: 30px;
+    margin: 10px 0px; /* bot&top lft&rgh */
+}
+
+q
+{
+    font-size: 16px;
+}
+
+blockquote
+{
+    font-style: italic;
+    color: #555;
+}
+
+p, li
+{
+    text-align: justify;
+    font-size: 20px;
+}
+
+p
+{
+    margin: 10px 0px; /* bot&top lft&rgh */
+}
+
+img+em
+{
+    display: block;
+    text-align: center;
+    width: 75%;
+    margin: 5px auto 40px auto; /* top right bottom left */
+}
+
+img
+{
+    display: block;
+    margin: 50px auto 5px auto; /* top right bottom left */
+}
+
+table
+{
+    width: 100% !important; /*Pandoc might insert a CSS inline style in the html output it generates*/
+    table-layout: auto;
+}
+
+col
+{
+    width: 0 !important; /*By default pandoc tries to have identical width for all columns*/
+}
+
+table, th, td
+{
+    border-collapse: collapse;
+    border: 0;
+}
+
+th, td
+{
+    padding: 5px 5px; /* bot&top lft&rgh */
+}
+
+thead
+{
+    background-color: #e88300;
+    color: white;
+}
+
